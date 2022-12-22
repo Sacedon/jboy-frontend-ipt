@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <title>final Project</title>
+</head>
+<body style="background-color: rgb(142, 130, 248);">
+<div class="container">
+<div class="content">
+  <a class="btn btn-secondary" href="shops.html">Back</a>
+
+      <h1 class="shop_name">Motorcycle Details</h1>
+      <hr>
+      <div class="row">
+        <div class="col-md-4 w-100 ">
+            <div class="mb-3 d-flex" style="display: inline-flex;">
+                <label for="model">Model Name:</label>
+                <input class="form-control" type="text" name="model" id="model"  required>
+            </div>
+
+
+            <div class="mb-3 d-flex" style="display: inline-flex;">
+                <label for="brand">Brand Name:</label>
+                <input class="form-control" type="text" name="brand" id="brand"  required>
+            </div>
+
+
+
+            
+    
+          <div class="">
+            <hr style="width: 400px;">
+                <div class="btns" style="display: inline-flex;">
+                <button id="confirm_update_shop" style="width: 100px; padding: 10px;" type="button" class="btn btn-success me-3">
+                    <i class="fa fa-save"></i> Update
+                </button>
+
+                <!-- Button trigger modal -->
+                <button id="confirm_delete_shop" style="width: 100px; padding: 10px;" type="button" class="btn btn-danger">
+                    <i class="fa fa-trash"></i> Delete
+                </button>
+                </div>
+        
+
+          </div>
+        </div>
+      </div>
+    
+    </div>
+  </div>
+    <script>
+      function getShops(id) {
+        fetch('http://localhost:8000/api/shops/' + id)
+          .then(response=>{
+            if(response.status==200) {
+              response.json()
+                .then(data=>renderShop(data))
+            }
+          })
+      }
+
+      $(document).ready(()=>{
+        const urlParams = new URLSearchParams(window.location.search);
+        const param_id = urlParams.get('id');
+
+        getShops(param_id)
+
+        $("#confirm_update_shop").click(()=>{
+          const data = {
+            "model":$("#model").val(),
+            "brand":$("#brand").val(),
+            
+         
+          }
+          fetch('http://localhost:8000/api/shops/' + param_id,{
+            credentials: "omit",
+            method:"PUT",
+            body: JSON.stringify(data),
+            headers : {
+              "Accept":"application/json",
+              "Content-Type":"application/json"
+            }
+          }).then(response=>{
+            if(response.status==200) {
+              window.location='shops.html'
+            }
+          })
+        })
+
+        $("#confirm_delete_shop").click(()=>{
+          fetch('http://localhost:8000/api/shops/' + param_id,{
+            credentials:"omit",
+            method: "DELETE",
+            headers: {
+              'Accept':'application/json'
+            }
+          }).then(response=>{
+            if(response.status==200) {
+              window.location='shops.html'
+              alert("Deleting Motorcycle, click 'OK' to proceed")
+            }
+            if(response.status==500) {
+              alert("This Motorcycle has existing Work data")
+            }
+          })
+        })
+      })
+
+    </script>
+
+</body>
+
+</html>

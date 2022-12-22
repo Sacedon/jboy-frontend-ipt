@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <title>Author</title>
+</head>
+<body style="background-color: rgb(151, 149, 247);">
+    <div class="container">
+       
+        <div class="content">
+            <div class="head">
+                <h1 class="h1">Shop</h1>
+            </div>
+            <button class="btn btn-danger float-end p-5 mb-2" data-bs-toggle="modal" data-bs-target="#createShopModal"> <i class="fa fa-plus"></i> Add Motorcycle</button>
+
+            <div class="modal fade" id="createShopModal" tabindex="-1" aria-labelledby="createShopModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="createShopModalLabel"> <i class='fa-solid fa-person'></i> Create New Motorcycle</h1>
+                      <button type="button" class="btn btn-secondary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+    
+                      
+    
+                        <div class="mb-3" style="display: inline-flex;">
+                            <label for="model">Model Name:</label>
+                            <input type="text" name="model" id="model"  required>
+                        </div>
+
+
+                        <div class="mb-3" style="display: inline-flex;">
+                            <label for="brand">Brand Name:</label>
+                            <input type="text" name="brand" id="brand"  required>
+                        </div>
+
+
+
+            
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+                      
+                      <a type="button" class="btn btn-secondary" id="save_btn">Add Motorcycle</a>
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>
+
+              <!--table-->
+
+              <table class="table table-bordered table-striped text-center">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Model Name</th>
+                        <th>Brand Name</th>
+                        
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+
+
+
+
+
+                <tbody id="shops">
+                    
+                </tbody>
+              </table>
+              <a href="motors.html" class="btn btn-success p-5 float-end"> <i class="fa fa-pencil"></i> Create Motor</a>
+        </div>
+    </div>
+</body>
+<script>
+    function getAllShops() {
+         fetch("http://localhost:8000/api/shops")
+           .then(response=>{
+             if(response.status==200) {
+               response.json()
+                 .then(data=>{
+                  renderShopTable(data.shop)
+                  
+                 })
+             }
+           })
+       }
+ 
+     function renderShopTable(shop){
+         const tbody = $("#authors")
+ 
+ 
+         shop.forEach((sp)=>{
+             const tr = $(document.createElement("tr"))
+             tr.append("<td class='text-black'>" + sp.id + "</td>")
+             tr.append("<td class='text-black'>" + sp.model + "</td>")
+             tr.append("<td class='text-black'>" + sp.brand + "</td>")
+             
+             tr.append("<td class='text-center text-black'><a href='show_shop.html?id=" + sp.id + "' class='btn btn-sm btn-success'><i class='fa-solid fa-user-pen'></i> &nbsp; Edit Motorcycle</a>")
+                                              
+ 
+             tbody.append(tr)
+         })
+     }
+ 
+     function prependShop(sp){
+         const tbody = $("#shops")
+ 
+         const tr = $(document.createElement("tr"))
+         tr.append("<td class='text-bg-primary'>" + sp.id + "</td>")
+         tr.append("<td class='text-bg-primary'>" + sp.model + "</td>")
+         tr.append("<td class='text-bg-primary'>" + sp.brand + "</td>")
+         tr.append("<td class='text-bg-primary text-center'><a href='show_shop.html?id=" + sp.id + "' class='btn btn-sm btn-danger'><i class='fa-solid fa-user-pen'></i> &nbsp; Edit Motorcycle</a>")
+            
+         tbody.prepend(tr)
+     }
+ 
+ 
+     function clearForm() {
+         $("#model").val()
+         $("#brand").val()
+         
+
+       
+       }
+ 
+       $(document).ready(()=>{
+         getAllShops()
+ 
+         $("#save_btn").click(()=>{
+           const data = {
+          
+             "model":$("#model").val(),
+             "brand":$("#brand").val(),
+             
+  
+           }
+ 
+           fetch("http://localhost:8000/api/shops",{
+             "credentials": "omit",
+             "method": "POST",
+             "body": JSON.stringify(data),
+             "headers":{
+               'Accept':'application/json',
+               'Content-Type':'application/json'
+             }
+           }).then(response=>{
+             if(response.status==200) {
+               response.json()
+                 .then(data=>prependShop(data))
+             }
+           })
+           
+           clearForm()
+           $("#createShopModal").modal('hide')
+         })
+       })
+       function timedRefresh(timeoutPeriod) {
+     setTimeout("location.reload(true);",timeoutPeriod);
+ }
+ 
+ 
+
+ </script>
+
+</html>

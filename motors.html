@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <title>Motorcycle</title>
+</head>
+<body style="background-color: rgb(134, 169, 245);">
+    <div class="container">
+       
+        <div class="content">
+            <div class="head">
+                <h1 class="h1">Shop</h1>
+            </div>
+            <a href="shops.html" class="btn btn-success p-2 float-start"> <i class="fa-solid fa-arrow-left"></i> <i class="fa fa-user"></i> Shops</a>
+            <button class="btn btn-danger float-end p-2 mb-2" data-bs-toggle="modal" data-bs-target="#createMotorModal"> <i class="fa-solid fa-book-open"></i> Add Motors</button>
+
+            <div class="modal fade" id="createMotorModal" tabindex="-1" aria-labelledby="createMotorModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="createMotorModalLabel"> <i class='fa-solid fa-person'></i> Create New Motorcycle/h1>
+                      <button type="button" class="btn btn-secondary btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+    
+                      
+    
+                        <div class="mb-3" style="display: inline-flex;">
+                            <label for="parts">Parts:</label>
+                            <input type="text" name="parts" id="parts"  required>
+                        </div>
+
+
+                        <div class="mb-3" style="display: inline-flex;">
+                            <label for="accessories">Accessories:</label>
+                            <input type="text" name="accessories" id="accessories"  required>
+                        </div>
+
+
+
+                        
+                        <div class="mb-3">
+                            <label for="model">Model Name:</label>
+                            <select name="model" id="model" class="">
+                                <option value="">Model's Name</option>
+                            </select>
+                          </div>
+                   
+            
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+                      <a type="button" class="btn btn-secondary" id="save_btn">Add Motor</a>
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>
+
+              <!--table-->
+
+              <table class="table table-bordered table-striped text-center">
+                <thead>
+                    <tr>
+                        <th>Parts</th>
+                        
+                        <th>Accessories</th>
+                        <th>Model's Name</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+
+                <tbody id="motor">
+                    
+                </tbody>
+              </table>
+
+        </div>
+    </div>
+</body>
+<script>
+    function getAllMotors() {
+         fetch("http://localhost:8000/api/motors")
+           .then(response=>{
+             if(response.status==200) {
+               response.json()
+                 .then(data=>{
+                  renderWorkTable(data.motor)
+                  
+                 })
+             }
+           })
+       }
+ 
+     function renderMotorTable(motors){
+         const tbody = $("#motor")
+ 
+ 
+         motors.forEach((mt)=>{
+             const tr = $(document.createElement("tr"))
+  
+             tr.append("<td class='text-black'>" + mt.parts + "</td>")
+             tr.append("<td class='text-black'>" + mt.accessories + "</td>")
+             tr.append("<td class='text-black'>" + mt.model + "</td>")
+             tr.append("<td class='text-center text-black'><a href='show_motor.html?id=" + mt.id + "' class='btn btn-sm btn-success'><i class='fa-solid fa-user-pen'></i> &nbsp; Edit Motor</a>")
+                                              
+ 
+             tbody.append(tr)
+         })
+     }
+
+     function getMotors() {
+        
+        fetch('http://localhost:8000/api/motors')
+          .then(response=>{
+            if(response.status==200) {
+              response.json()
+              .then(data=>renderMotorsSelect(data['shop']))
+            }
+          })
+      }
+     
+    function renderMotorsSelect(shops) {
+        const ath = $("#model")
+        shops.forEach((a)=>{
+          const opt = $(document.createElement("option"))
+          opt.attr('value',a.id)
+          opt.text(a.model)
+          ath.append(opt)
+        })
+      }
+ 
+     function prependMotor(mt){
+         const tbody = $("#motor")
+ 
+         const tr = $(document.createElement("tr"))
+   
+         tr.append("<td class='text-bg-primary'>" + mt.parts + "</td>")
+         tr.append("<td class='text-bg-primary'>" + mt.accessories + "</td>")
+         tr.append("<td class='text-bg-primary'>" + mt.model + "</td>")
+         tr.append("<td class='text-bg-primary text-center'><a href='show_motor.html?id=" + mt.id + "' class='btn btn-sm btn-danger'><i class='fa-solid fa-user-pen'></i> &nbsp; Edit Motor</a>")
+            
+         tbody.prepend(tr)
+     }
+ 
+ 
+     function clearForm() {
+         $("#parts").val()
+         $("#accessories").val()
+         $("#model").val()
+
+
+       
+       }
+ 
+       $(document).ready(()=>{
+         getAllMotors()
+         getShops()
+ 
+         $("#save_btn").click(()=>{
+           const data = {
+          
+             "parts":$("#parts").val(),
+             "accessories":$("#accessories").val(),
+             "model":$("#model").val(),
+
+  
+           }
+ 
+           fetch("http://localhost:8000/api/motors",{
+             "credentials": "omit",
+             "method": "POST",
+             "body": JSON.stringify(data),
+             "headers":{
+               'Accept':'application/json',
+               'Content-Type':'application/json'
+             }
+           }).then(response=>{
+             if(response.status==200) {
+               response.json()
+                 .then(data=>prependWork(data))
+             }
+           })
+           
+           clearForm()
+           $("#createMotorModal").modal('hide')
+         })
+       })
+       function timedRefresh(timeoutPeriod) {
+     setTimeout("location.reload(true);",timeoutPeriod);
+ }
+ 
+ 
+ </script>
+
+</html>
